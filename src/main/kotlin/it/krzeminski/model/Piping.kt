@@ -15,8 +15,7 @@ sealed class PipeSegment {
     class Arc(
         val startPosition: Point,
         val endPosition: Point,
-        val startAngle: AngleDegrees,
-        val endAngle: AngleDegrees
+        val center: Point
     ) : PipeSegment()
 }
 
