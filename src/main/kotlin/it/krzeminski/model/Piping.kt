@@ -25,5 +25,3 @@ data class Point(
     val x: Float,
     val y: Float
 )
-
-inline class AngleDegrees(val value: Float)
