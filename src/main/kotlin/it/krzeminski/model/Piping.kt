@@ -30,3 +30,5 @@ enum class Direction {
 }
 
 inline class Degrees(val angle: Float)
+
+val Int.degrees get() = Degrees(angle = this.toFloat())
