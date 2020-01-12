@@ -1,5 +1,7 @@
 package it.krzeminski.model
 
+import kotlin.math.PI
+
 data class Pipe(
     val initialOrientation: Degrees,
     val initialPosition: Point,
@@ -30,5 +32,7 @@ enum class Direction {
 }
 
 inline class Degrees(val angle: Float)
+
+val Degrees.radians get() = this.angle * PI / 180.0f
 
 val Int.degrees get() = Degrees(angle = this.toFloat())
