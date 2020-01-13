@@ -19,9 +19,7 @@ object DrawShapesExample {
     internal class CustomPaintComponent : Component() {
         override fun paint(g: Graphics) {
             val g2d = g as Graphics2D
-
             val piping = parallelLines
-
             g2d.render(piping)
         }
     }
