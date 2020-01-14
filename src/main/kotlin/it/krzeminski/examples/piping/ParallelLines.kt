@@ -1,6 +1,7 @@
 package it.krzeminski.examples.piping
 
 import it.krzeminski.model.*
+import it.krzeminski.repeat
 
 val parallelLines = Pipe(
     initialOrientation = 90.degrees,
@@ -13,11 +14,3 @@ val parallelLines = Pipe(
         PipeSegment.Arc(radius = 14.0f, angle = 180.degrees, direction = Direction.RIGHT))
         .repeat(17)
     )
-
-fun <E> List<E>.repeat(times: Int): List<E> {
-    return mutableListOf<E>().apply {
-        repeat(times) {
-            addAll(this@repeat)
-        }
-    }
-}
