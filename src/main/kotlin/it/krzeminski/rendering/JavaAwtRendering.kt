@@ -7,11 +7,6 @@ import kotlin.math.sin
 import java.awt.RenderingHints
 
 fun Graphics2D.render(pipe: Pipe) {
-    val renderingHints = RenderingHints(mapOf(
-        RenderingHints.KEY_ANTIALIASING to RenderingHints.VALUE_ANTIALIAS_ON,
-        RenderingHints.KEY_RENDERING to RenderingHints.VALUE_RENDER_QUALITY))
-    setRenderingHints(renderingHints)
-
     translate(pipe.initialPosition.x.toInt(), pipe.initialPosition.y.toInt())
     rotate(pipe.initialOrientation.radians)
 

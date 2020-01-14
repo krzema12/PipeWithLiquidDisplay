@@ -22,6 +22,11 @@ object DrawShapesExample {
     internal class CustomPaintComponent : Component() {
         override fun paint(g: Graphics) {
             val g2d = g as Graphics2D
+            val renderingHints = RenderingHints(mapOf(
+                RenderingHints.KEY_ANTIALIASING to RenderingHints.VALUE_ANTIALIAS_ON,
+                RenderingHints.KEY_RENDERING to RenderingHints.VALUE_RENDER_QUALITY))
+            g2d.setRenderingHints(renderingHints)
+
 //            val piping = parallelLines
 //            g2d.render(piping)
             g2d.color = Color.BLUE
