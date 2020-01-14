@@ -13,20 +13,27 @@ fun Graphics2D.render(pipe: Pipe, liquidStream: LiquidStream) {
     rotate(pipe.initialOrientation.radians)
 
     pipe.pipeSegments.forEach {
-        render(it, pipe.radius)
+        render(it, pipe.radius, liquidStream)
     }
 }
 
-fun Graphics2D.render(pipeSegment: PipeSegment, radius: Float) =
+fun Graphics2D.render(pipeSegment: PipeSegment, radius: Float, liquidStream: LiquidStream) =
     when (pipeSegment) {
-        is PipeSegment.Straight -> renderStraight(pipeSegment, radius)
-        is PipeSegment.Arc -> renderArc(pipeSegment, radius)
+        is PipeSegment.Straight -> renderStraight(pipeSegment, radius, liquidStream)
+        is PipeSegment.Arc -> renderArc(pipeSegment, radius, liquidStream)
     }
 
-fun Graphics2D.renderStraight(pipeSegment: PipeSegment.Straight, pipeRadius: Float) {
+fun Graphics2D.renderStraight(
+    pipeSegment: PipeSegment.Straight,
+    pipeRadius: Float,
+    liquidStream: LiquidStream
+) {
     // Liquid.
     color = Color.CYAN
-    fillRect(0, -pipeRadius.toInt(), pipeSegment.length.toInt(), 2*pipeRadius.toInt())
+    // TODO check if the segments don't go beyond pipe's length
+    getLiquidSegmentToDraw(pipeSegment, pipeRadius, liquidStream).forEach { (startX, width) ->
+        fillRect(startX.toInt(), -pipeRadius.toInt(), width.toInt(), 2 * pipeRadius.toInt())
+    }
 
     // Pipe boundaries.
     color = Color.BLACK
@@ -36,7 +43,31 @@ fun Graphics2D.renderStraight(pipeSegment: PipeSegment.Straight, pipeRadius: Flo
     translate(pipeSegment.length.toInt(), 0)
 }
 
-fun Graphics2D.renderArc(pipeSegment: PipeSegment.Arc, pipeRadius: Float) {
+data class LiquidSegmentToDrawStraight(
+    val startX: Float,
+    val width: Float
+)
+
+fun getLiquidSegmentToDraw(pipeSegment: PipeSegment.Straight, pipeRadius: Float, liquidStream: LiquidStream): List<LiquidSegmentToDrawStraight> {
+    val drawableWidths = liquidStream.streamSegment.map {
+        it.volume / (2.0f * pipeRadius)
+    }
+    val cumulativeDrawableWidths = drawableWidths.fold(listOf(0.0f)) {
+        acc, width -> acc + (acc.last() + width)
+    }
+    val allSegmentsToDraw = (drawableWidths zip cumulativeDrawableWidths).map { (width, startX) ->
+        LiquidSegmentToDrawStraight(startX, width)
+    }
+    return (allSegmentsToDraw zip liquidStream.streamSegment).filter { (_, streamSegment) ->
+        streamSegment.liquidPresent
+    }.map { (segmentToDraw, _) -> segmentToDraw }
+}
+
+fun Graphics2D.renderArc(
+    pipeSegment: PipeSegment.Arc,
+    pipeRadius: Float,
+    liquidStream: LiquidStream
+) {
     if (pipeSegment.direction == Direction.LEFT) {
         scale(1.0, -1.0)
     }

@@ -3,6 +3,7 @@ package it.krzeminski.rendering
 import it.krzeminski.examples.piping.parallelLines
 import it.krzeminski.examples.piping.spiral
 import it.krzeminski.model.LiquidStream
+import it.krzeminski.model.LiquidStreamSegment
 import java.awt.*
 import java.awt.geom.Arc2D
 import java.awt.geom.Area
@@ -29,7 +30,15 @@ object DrawShapesExample {
             g2d.setRenderingHints(renderingHints)
 
             val piping = parallelLines
-            val liquidStream = LiquidStream(streamSegment = emptyList())
+            val liquidStream = LiquidStream(
+                streamSegment = listOf(
+                    LiquidStreamSegment(true, 400.0f),
+                    LiquidStreamSegment(false, 200.0f),
+                    LiquidStreamSegment(true, 800.0f),
+                    LiquidStreamSegment(false, 1000.0f),
+                    LiquidStreamSegment(true, 100.0f)
+                )
+            )
             g2d.render(piping, liquidStream)
         }
     }
