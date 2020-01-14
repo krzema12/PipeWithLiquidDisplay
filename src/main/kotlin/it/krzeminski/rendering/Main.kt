@@ -2,6 +2,7 @@ package it.krzeminski.rendering
 
 import it.krzeminski.examples.piping.parallelLines
 import it.krzeminski.examples.piping.spiral
+import it.krzeminski.model.LiquidStream
 import java.awt.*
 import java.awt.geom.Arc2D
 import java.awt.geom.Area
@@ -27,23 +28,9 @@ object DrawShapesExample {
                 RenderingHints.KEY_RENDERING to RenderingHints.VALUE_RENDER_QUALITY))
             g2d.setRenderingHints(renderingHints)
 
-//            val piping = parallelLines
-//            g2d.render(piping)
-            g2d.color = Color.BLUE
-            val arc2dOuter = Arc2D.Float(
-                200.0f, 200.0f,
-                300.0f, 300.0f,
-                20.0f, 70.0f,
-                Arc2D.PIE)
-            val arc2dInner = Arc2D.Float(
-                250.0f, 250.0f,
-                200.0f, 200.0f,
-                20.0f, 70.0f,
-                Arc2D.PIE)
-            val area = Area(arc2dOuter).apply {
-                subtract(Area(arc2dInner))
-            }
-            g2d.fill(area)
+            val piping = parallelLines
+            val liquidStream = LiquidStream(streamSegment = emptyList())
+            g2d.render(piping, liquidStream)
         }
     }
 }
