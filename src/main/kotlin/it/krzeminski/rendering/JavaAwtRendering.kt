@@ -56,4 +56,7 @@ fun Graphics2D.renderArc(pipeSegment: PipeSegment.Arc, pipeRadius: Float) {
         pipeSegment.radius - pipeSegment.radius * cos(pipeSegment.angle.radians)
     )
     rotate(pipeSegment.angle.radians)
+    if (pipeSegment.direction == Direction.LEFT) {
+        scale(1.0, -1.0)
+    }
 }
