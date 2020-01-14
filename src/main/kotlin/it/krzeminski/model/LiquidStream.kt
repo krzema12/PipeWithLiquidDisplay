@@ -5,12 +5,6 @@ data class LiquidStream(
 )
 
 data class LiquidStreamSegment(
-    val color: Color,
+    val liquidPresent: Boolean,
     val volume: Float
-)
-
-data class Color(
-    val red: Float,
-    val green: Float,
-    val blue: Float
 )
