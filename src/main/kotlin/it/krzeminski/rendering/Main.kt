@@ -1,6 +1,7 @@
 package it.krzeminski.rendering
 
 import it.krzeminski.examples.piping.parallelLines
+import it.krzeminski.examples.piping.spiral
 import java.awt.*
 
 object DrawShapesExample {
@@ -19,7 +20,7 @@ object DrawShapesExample {
     internal class CustomPaintComponent : Component() {
         override fun paint(g: Graphics) {
             val g2d = g as Graphics2D
-            val piping = parallelLines
+            val piping = spiral
             g2d.render(piping)
         }
     }
