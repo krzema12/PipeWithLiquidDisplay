@@ -32,11 +32,9 @@ object DrawShapesExample {
             val piping = parallelLines
             val liquidStream = LiquidStream(
                 streamSegment = listOf(
-                    LiquidStreamSegment(true, 400.0f),
-                    LiquidStreamSegment(false, 200.0f),
-                    LiquidStreamSegment(true, 800.0f),
-                    LiquidStreamSegment(false, 1000.0f),
-                    LiquidStreamSegment(true, 100.0f)
+                    LiquidStreamSegment(true, 200.0f),
+                    LiquidStreamSegment(false, 100.0f),
+                    LiquidStreamSegment(true, 400.0f)
                 )
             )
             g2d.render(piping, liquidStream)

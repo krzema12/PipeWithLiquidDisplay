@@ -7,6 +7,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import java.awt.geom.Arc2D
 import java.awt.geom.Area
+import kotlin.math.PI
 
 fun Graphics2D.render(pipe: Pipe, liquidStream: LiquidStream) {
     translate(pipe.initialPosition.x.toInt(), pipe.initialPosition.y.toInt())
@@ -48,6 +49,11 @@ data class LiquidSegmentToDrawStraight(
     val width: Float
 )
 
+data class LiquidSegmentToDrawArc(
+    val startAngle: Float,
+    val extentAngle: Float
+)
+
 fun getLiquidSegmentToDraw(pipeSegment: PipeSegment.Straight, pipeRadius: Float, liquidStream: LiquidStream): List<LiquidSegmentToDrawStraight> {
     val drawableWidths = liquidStream.streamSegment.map {
         it.volume / (2.0f * pipeRadius)
@@ -57,6 +63,24 @@ fun getLiquidSegmentToDraw(pipeSegment: PipeSegment.Straight, pipeRadius: Float,
     }
     val allSegmentsToDraw = (drawableWidths zip cumulativeDrawableWidths).map { (width, startX) ->
         LiquidSegmentToDrawStraight(startX, width)
+    }
+    return (allSegmentsToDraw zip liquidStream.streamSegment).filter { (_, streamSegment) ->
+        streamSegment.liquidPresent
+    }.map { (segmentToDraw, _) -> segmentToDraw }
+}
+
+fun getLiquidSegmentToDraw(pipeSegment: PipeSegment.Arc, pipeRadius: Float, liquidStream: LiquidStream): List<LiquidSegmentToDrawArc> {
+    val smallRadius = (pipeSegment.radius - pipeRadius)
+    val largeRadius = (pipeSegment.radius + pipeRadius)
+
+    val drawableAngleExtents = liquidStream.streamSegment.map {
+        it.volume * 360.0f / (PI.toFloat() * (largeRadius*largeRadius - smallRadius*smallRadius))
+    }
+    val cumulativeDrawableAngleExtents = drawableAngleExtents.fold(listOf(0.0f)) {
+            acc, width -> acc + (acc.last() + width)
+    }
+    val allSegmentsToDraw = (drawableAngleExtents zip cumulativeDrawableAngleExtents).map { (extentAngle, startAngle) ->
+        LiquidSegmentToDrawArc(startAngle, extentAngle)
     }
     return (allSegmentsToDraw zip liquidStream.streamSegment).filter { (_, streamSegment) ->
         streamSegment.liquidPresent
@@ -79,20 +103,10 @@ fun Graphics2D.renderArc(
 
     // Liquid.
     color = Color.CYAN
-    val arcOuter = Arc2D.Float(
-        -largeRadius, -pipeRadius,
-        largeDiameter, largeDiameter,
-        90.0f, -pipeSegment.angle.angle,
-        Arc2D.PIE)
-    val arcInner = Arc2D.Float(
-        -smallRadius, pipeRadius,
-        smallDiameter, smallDiameter,
-        90.0f, -pipeSegment.angle.angle,
-        Arc2D.PIE)
-    val area = Area(arcOuter).apply {
-        subtract(Area(arcInner))
+    getLiquidSegmentToDraw(pipeSegment, pipeRadius, liquidStream).forEach { (startAngle, extentAngle) ->
+        fillArcWithoutCenter(
+            pipeSegment, largeRadius, pipeRadius, largeDiameter, smallRadius, smallDiameter, startAngle, extentAngle)
     }
-    fill(area)
 
     // Pipe boundaries.
     color = Color.BLACK
@@ -115,4 +129,32 @@ fun Graphics2D.renderArc(
     if (pipeSegment.direction == Direction.LEFT) {
         scale(1.0, -1.0)
     }
+}
+
+fun Graphics2D.fillArcWithoutCenter(
+    pipeSegment: PipeSegment.Arc,
+    largeRadius: Float,
+    pipeRadius: Float,
+    largeDiameter: Float,
+    smallRadius: Float,
+    smallDiameter: Float,
+    startAngle: Float,
+    endAngle: Float
+) {
+    val arcOuter = Arc2D.Float(
+        -largeRadius, -pipeRadius,
+        largeDiameter, largeDiameter,
+        90.0f - startAngle, -endAngle,
+        Arc2D.PIE
+    )
+    val arcInner = Arc2D.Float(
+        -smallRadius, pipeRadius,
+        smallDiameter, smallDiameter,
+        90.0f - startAngle, -endAngle,
+        Arc2D.PIE
+    )
+    val area = Area(arcOuter).apply {
+        subtract(Area(arcInner))
+    }
+    fill(area)
 }
