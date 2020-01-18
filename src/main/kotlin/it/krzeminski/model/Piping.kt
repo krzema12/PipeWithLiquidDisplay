@@ -10,15 +10,27 @@ data class Pipe(
 )
 
 sealed class PipeSegment {
+    abstract fun volume(pipeRadius: Float): Float
+
     class Straight(
         val length: Float
-    ) : PipeSegment()
+    ) : PipeSegment() {
+        override fun volume(pipeRadius: Float) =
+            length * 2.0f * pipeRadius
+    }
 
     class Arc(
         val radius: Float,
         val angle: Degrees,
         val direction: Direction
-    ) : PipeSegment()
+    ) : PipeSegment() {
+        override fun volume(pipeRadius: Float): Float {
+            val smallRadius = (radius - pipeRadius)
+            val largeRadius = (radius + pipeRadius)
+
+            return (PI.toFloat() * (largeRadius*largeRadius - smallRadius*smallRadius)) * angle.angle / 360.0f
+        }
+    }
 }
 
 data class Point(

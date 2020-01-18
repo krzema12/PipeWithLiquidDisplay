@@ -1,5 +1,8 @@
 package it.krzeminski.rendering
 
+import it.krzeminski.cumulativeSum
+import it.krzeminski.cutSequentialItems
+import it.krzeminski.groupSequentialItems
 import it.krzeminski.model.*
 import java.awt.Color
 import java.awt.Graphics2D
@@ -13,8 +16,19 @@ fun Graphics2D.render(pipe: Pipe, liquidStream: LiquidStream) {
     translate(pipe.initialPosition.x.toInt(), pipe.initialPosition.y.toInt())
     rotate(pipe.initialOrientation.radians)
 
-    pipe.pipeSegments.forEach {
-        render(it, pipe.radius, liquidStream)
+    val liquidStreamCutForPipeSegments = cutSequentialItems(
+        liquidStream.streamSegment,
+        pipe.pipeSegments.map { it.volume(pipe.radius) },
+        { it.volume },
+        { segment, newVolume -> segment.copy(volume = newVolume) })
+
+    val liquidStreamSegmentsPerPipeSegment = groupSequentialItems(
+        liquidStreamCutForPipeSegments,
+        pipe.pipeSegments.map { it.volume(pipe.radius) },
+        { it.volume })
+
+    (pipe.pipeSegments zip liquidStreamSegmentsPerPipeSegment).forEach { (pipeSegment, liquidStreamForPipeSegment) ->
+        render(pipeSegment, pipe.radius, LiquidStream(liquidStreamForPipeSegment))
     }
 }
 
@@ -58,9 +72,7 @@ fun getLiquidSegmentToDraw(pipeSegment: PipeSegment.Straight, pipeRadius: Float,
     val drawableWidths = liquidStream.streamSegment.map {
         it.volume / (2.0f * pipeRadius)
     }
-    val cumulativeDrawableWidths = drawableWidths.fold(listOf(0.0f)) {
-        acc, width -> acc + (acc.last() + width)
-    }
+    val cumulativeDrawableWidths = drawableWidths.cumulativeSum(0.0f) { a, b -> a + b }
     val allSegmentsToDraw = (drawableWidths zip cumulativeDrawableWidths).map { (width, startX) ->
         LiquidSegmentToDrawStraight(startX, width)
     }
@@ -76,9 +88,7 @@ fun getLiquidSegmentToDraw(pipeSegment: PipeSegment.Arc, pipeRadius: Float, liqu
     val drawableAngleExtents = liquidStream.streamSegment.map {
         it.volume * 360.0f / (PI.toFloat() * (largeRadius*largeRadius - smallRadius*smallRadius))
     }
-    val cumulativeDrawableAngleExtents = drawableAngleExtents.fold(listOf(0.0f)) {
-            acc, width -> acc + (acc.last() + width)
-    }
+    val cumulativeDrawableAngleExtents = drawableAngleExtents.cumulativeSum(0.0f) { a, b -> a + b }
     val allSegmentsToDraw = (drawableAngleExtents zip cumulativeDrawableAngleExtents).map { (extentAngle, startAngle) ->
         LiquidSegmentToDrawArc(startAngle, extentAngle)
     }
