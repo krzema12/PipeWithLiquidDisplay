@@ -12,5 +12,6 @@ val parallelLines = Pipe(
         PipeSegment.Arc(radius = 14.0f, angle = 180.degrees, direction = Direction.LEFT),
         PipeSegment.Straight(length = 650.0f),
         PipeSegment.Arc(radius = 14.0f, angle = 180.degrees, direction = Direction.RIGHT))
-        .repeat(17)
+//        .repeat(17)
+        .repeat(5)
     )
