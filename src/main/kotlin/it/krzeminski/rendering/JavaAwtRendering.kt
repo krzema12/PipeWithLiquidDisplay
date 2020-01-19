@@ -44,7 +44,7 @@ fun Graphics2D.renderStraight(
     liquidStream: LiquidStream
 ) {
     // Liquid.
-    color = Color.CYAN
+    color = Color.BLUE
     // TODO check if the segments don't go beyond pipe's length
     getLiquidSegmentToDraw(pipeSegment, pipeRadius, liquidStream).forEach { (startX, width) ->
         fillRect(startX.toInt(), -pipeRadius.toInt(), width.toInt(), 2 * pipeRadius.toInt())
@@ -112,7 +112,7 @@ fun Graphics2D.renderArc(
     val largeDiameter = 2 * largeRadius
 
     // Liquid.
-    color = Color.CYAN
+    color = Color.BLUE
     getLiquidSegmentToDraw(pipeSegment, pipeRadius, liquidStream).forEach { (startAngle, extentAngle) ->
         fillArcWithoutCenter(
             pipeSegment, largeRadius, pipeRadius, largeDiameter, smallRadius, smallDiameter, startAngle, extentAngle)
