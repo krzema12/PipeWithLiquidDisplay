@@ -5,34 +5,41 @@ import it.krzeminski.model.LiquidStream
 import it.krzeminski.model.LiquidStreamSegment
 import it.krzeminski.repeat
 import java.awt.*
-import java.lang.System.currentTimeMillis
-import javax.swing.Timer
-import kotlin.properties.Delegates
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
 
 object DrawShapesExample {
     @JvmStatic
     fun main(args: Array<String>) {
         val frame = Frame()
+        val customPaintComponent = CustomPaintComponent()
+        frame.add(customPaintComponent)
 
-        frame.add(CustomPaintComponent())
-
-        val frameWidth = 400
+        val frameWidth = 1024
         val frameHeight = 768
         frame.setSize(frameWidth, frameHeight)
         frame.isVisible = true
+        frame.addKeyListener(object : KeyListener {
+            override fun keyTyped(e: KeyEvent?) {
+            }
 
-        val t = Timer(50) {
-            frame.repaint()
-        }
-        t.start()
+            override fun keyPressed(e: KeyEvent?) {
+                when (e?.keyChar) {
+                    'q' -> customPaintComponent.liquidOffset += 20.0f
+                    'a' -> customPaintComponent.liquidOffset -= 20.0f
+                    'w' -> customPaintComponent.liquidOffset += 200.0f
+                    's' -> customPaintComponent.liquidOffset -= 200.0f
+                }
+                frame.repaint()
+            }
+
+            override fun keyReleased(e: KeyEvent?) {
+            }
+        })
     }
 
     internal class CustomPaintComponent() : Component() {
-        private var startTime by Delegates.notNull<Long>()
-
-        init {
-            startTime = currentTimeMillis()
-        }
+        var liquidOffset: Float = 0.0f
 
         override fun paint(g: Graphics) {
             // Draw to a back-buffer first.
@@ -45,11 +52,9 @@ object DrawShapesExample {
                 RenderingHints.KEY_RENDERING to RenderingHints.VALUE_RENDER_QUALITY))
             g2d.setRenderingHints(renderingHints)
 
-            val offset = (currentTimeMillis() - startTime).toFloat() * 0.1f
-
             val piping = parallelLines
             val liquidStream = LiquidStream(
-                streamSegment = listOf(LiquidStreamSegment(false, offset)) + listOf(
+                streamSegment = listOf(LiquidStreamSegment(false, liquidOffset)) + listOf(
                     LiquidStreamSegment(true, 12340.0f),
                     LiquidStreamSegment(false, 234.0f),
                     LiquidStreamSegment(true, 345.0f),
