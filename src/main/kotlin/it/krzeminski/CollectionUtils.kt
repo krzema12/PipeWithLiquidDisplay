@@ -57,7 +57,11 @@ fun <T> groupSequentialItems(
         .cumulativeSum(0.0f, Float::plus)
         .drop(1)
     val itemsForThisGroup = (items zip itemsWidthCumulativeSum)
-        .takeWhile { (_, cumulativeSum) -> cumulativeSum <= groupingIntervals.first() + 0.005 }
+        // TODO the '0.05' constant is to compensate for a bug that makes this algorithm not take
+        // some small liquid segment that would perfectly fit a given pipe segment, but it doesn't
+        // because of some float-related imprecise calculations. To get rid of this, it would be probably
+        // a good idea to merge the two functions: cutSequentialItems and groupSequentialItems.
+        .takeWhile { (_, cumulativeSum) -> cumulativeSum <= groupingIntervals.first() + 0.05 }
         .map { (item, _) -> item }
     return listOf(itemsForThisGroup) + groupSequentialItems(
         items.drop(itemsForThisGroup.size),
