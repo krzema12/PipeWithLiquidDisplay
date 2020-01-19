@@ -16,8 +16,12 @@ fun Graphics2D.render(pipe: Pipe, liquidStream: LiquidStream) {
     translate(pipe.initialPosition.x.toInt(), pipe.initialPosition.y.toInt())
     rotate(pipe.initialOrientation.radians)
 
+    val liquidStreamWithCursorAtEnd = liquidStream.copy(
+        streamSegment = liquidStream.streamSegment + LiquidStreamSegment(true, 100.0f)
+    )
+
     val liquidStreamCutForPipeSegments = cutSequentialItems(
-        liquidStream.streamSegment,
+        liquidStreamWithCursorAtEnd.streamSegment,
         pipe.pipeSegments.map { it.volume(pipe.radius) },
         { it.volume },
         { segment, newVolume -> segment.copy(volume = newVolume) })

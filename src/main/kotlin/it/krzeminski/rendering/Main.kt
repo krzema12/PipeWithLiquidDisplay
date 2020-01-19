@@ -29,6 +29,8 @@ object DrawShapesExample {
                     'a' -> customPaintComponent.liquidOffset -= 20.0f
                     'w' -> customPaintComponent.liquidOffset += 200.0f
                     's' -> customPaintComponent.liquidOffset -= 200.0f
+                    'e' -> customPaintComponent.addPieceOfLiquid(200.0f)
+                    'd' -> customPaintComponent.addPieceOfAir(200.0f)
                 }
                 frame.repaint()
             }
@@ -40,6 +42,8 @@ object DrawShapesExample {
 
     internal class CustomPaintComponent() : Component() {
         var liquidOffset: Float = 0.0f
+        var editableLiquidStream = LiquidStream(
+            streamSegment = listOf(LiquidStreamSegment(false, 0.0f)))
 
         override fun paint(g: Graphics) {
             // Draw to a back-buffer first.
@@ -53,17 +57,47 @@ object DrawShapesExample {
             g2d.setRenderingHints(renderingHints)
 
             val piping = parallelLines
-            val liquidStream = LiquidStream(
-                streamSegment = listOf(LiquidStreamSegment(false, liquidOffset)) + listOf(
-                    LiquidStreamSegment(true, 12340.0f),
-                    LiquidStreamSegment(false, 234.0f),
-                    LiquidStreamSegment(true, 345.0f),
-                    LiquidStreamSegment(false, 567.0f)
-                ).repeat(30)
-            )
-            g2d.render(piping, liquidStream)
+//            val liquidStream = LiquidStream(
+//                streamSegment = listOf(LiquidStreamSegment(false, liquidOffset)) + listOf(
+//                    LiquidStreamSegment(true, 12340.0f),
+//                    LiquidStreamSegment(false, 234.0f),
+//                    LiquidStreamSegment(true, 345.0f),
+//                    LiquidStreamSegment(false, 567.0f)
+//                ).repeat(30)
+//            )
+            g2d.render(piping, editableLiquidStream)
 
             g.drawImage(backBufferImage, 0, 0, this)
+        }
+
+        fun addPieceOfLiquid(volume: Float) {
+            with (editableLiquidStream) {
+                editableLiquidStream = if (streamSegment.last().liquidPresent) {
+                    val lastSegment = streamSegment.last()
+                    copy(
+                        streamSegment = streamSegment.dropLast(1) +
+                                LiquidStreamSegment(true, lastSegment.volume + volume))
+                } else {
+                    copy(
+                        streamSegment = streamSegment +
+                                LiquidStreamSegment(true, volume))
+                }
+            }
+        }
+
+        fun addPieceOfAir(volume: Float) {
+            with (editableLiquidStream) {
+                editableLiquidStream = if (!streamSegment.last().liquidPresent) {
+                    val lastSegment = streamSegment.last()
+                    copy(
+                        streamSegment = streamSegment.dropLast(1) +
+                                LiquidStreamSegment(false, lastSegment.volume + volume))
+                } else {
+                    copy(
+                        streamSegment = streamSegment +
+                                LiquidStreamSegment(false, volume))
+                }
+            }
         }
     }
 }
