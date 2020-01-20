@@ -26,10 +26,10 @@ object DrawShapesExample {
 
             override fun keyPressed(e: KeyEvent?) {
                 when (e?.keyChar) {
-                    'q' -> customPaintComponent.liquidOffset += 20.0f
-                    'a' -> customPaintComponent.liquidOffset -= 20.0f
-                    'w' -> customPaintComponent.liquidOffset += 200.0f
-                    's' -> customPaintComponent.liquidOffset -= 200.0f
+                    'q' -> customPaintComponent.changeLiquidOffset(20.0f)
+                    'a' -> customPaintComponent.changeLiquidOffset(-20.0f)
+                    'w' -> customPaintComponent.changeLiquidOffset(200.0f)
+                    's' -> customPaintComponent.changeLiquidOffset(-200.0f)
                     'e' -> customPaintComponent.addPieceOfLiquid(200.0f)
                     'd' -> customPaintComponent.addPieceOfAir(200.0f)
                 }
@@ -102,6 +102,13 @@ object DrawShapesExample {
                                 LiquidStreamSegment(false, volume))
                 }
             }
+        }
+
+        fun changeLiquidOffset(airVolume: Float) {
+            val first = editableLiquidStream.streamSegment.first()
+            editableLiquidStream = editableLiquidStream.copy(streamSegment =
+                listOf(first.copy(liquidPresent = false, volume = first.volume + airVolume))
+                        + editableLiquidStream.streamSegment.drop(1))
         }
     }
 }
