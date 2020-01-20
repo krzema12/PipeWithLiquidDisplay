@@ -7,6 +7,7 @@ import it.krzeminski.repeat
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
+import javax.imageio.ImageIO
 
 object DrawShapesExample {
     @JvmStatic
@@ -65,6 +66,9 @@ object DrawShapesExample {
 //                    LiquidStreamSegment(false, 567.0f)
 //                ).repeat(30)
 //            )
+            g2d.drawImage(
+                ImageIO.read(this.javaClass.getResource("/images/heart.jpg")),
+                100, 50, 236*3, 218*3, this)
             g2d.render(piping, editableLiquidStream)
 
             g.drawImage(backBufferImage, 0, 0, this)
