@@ -13,8 +13,8 @@ object DrawShapesExample {
     @JvmStatic
     fun main(args: Array<String>) {
         val frame = Frame()
-        val customPaintComponent = CustomPaintComponent()
-        frame.add(customPaintComponent)
+        val pipeWithLiquidDisplayComponent = PipeWithLiquidDisplayComponent()
+        frame.add(pipeWithLiquidDisplayComponent)
 
         val frameWidth = 1024
         val frameHeight = 768
@@ -26,12 +26,12 @@ object DrawShapesExample {
 
             override fun keyPressed(e: KeyEvent?) {
                 when (e?.keyChar) {
-                    'q' -> customPaintComponent.changeLiquidOffset(20.0f)
-                    'a' -> customPaintComponent.changeLiquidOffset(-20.0f)
-                    'w' -> customPaintComponent.changeLiquidOffset(200.0f)
-                    's' -> customPaintComponent.changeLiquidOffset(-200.0f)
-                    'e' -> customPaintComponent.addPieceOfLiquid(200.0f)
-                    'd' -> customPaintComponent.addPieceOfAir(200.0f)
+                    'q' -> pipeWithLiquidDisplayComponent.changeLiquidOffset(20.0f)
+                    'a' -> pipeWithLiquidDisplayComponent.changeLiquidOffset(-20.0f)
+                    'w' -> pipeWithLiquidDisplayComponent.changeLiquidOffset(200.0f)
+                    's' -> pipeWithLiquidDisplayComponent.changeLiquidOffset(-200.0f)
+                    'e' -> pipeWithLiquidDisplayComponent.addPieceOfLiquid(200.0f)
+                    'd' -> pipeWithLiquidDisplayComponent.addPieceOfAir(200.0f)
                 }
                 frame.repaint()
             }
@@ -41,7 +41,7 @@ object DrawShapesExample {
         })
     }
 
-    internal class CustomPaintComponent() : Component() {
+    internal class PipeWithLiquidDisplayComponent() : Component() {
         var liquidOffset: Float = 0.0f
         var editableLiquidStream = LiquidStream(
             streamSegment = listOf(LiquidStreamSegment(false, 0.0f)))
