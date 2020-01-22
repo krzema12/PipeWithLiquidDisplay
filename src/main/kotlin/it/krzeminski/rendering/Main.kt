@@ -36,6 +36,7 @@ object DrawShapesExample {
                     'e' -> pipeWithLiquidDisplayComponent.addPieceOfLiquid(200.0f)
                     'd' -> pipeWithLiquidDisplayComponent.addPieceOfAir(200.0f)
                     'c' -> pipeWithLiquidDisplayComponent.clearLiquidStream()
+                    'i' -> pipeWithLiquidDisplayComponent.toggleImage()
                 }
                 e?.let {
                     if (e.keyCode in 48..58) {
@@ -61,6 +62,7 @@ object DrawShapesExample {
     internal class PipeWithLiquidDisplayComponent() : Component() {
         var liquidOffset: Float = 0.0f
         var piping = parallelLines
+        var displayImage = true
         var editableLiquidStream = LiquidStream(
             streamSegment = listOf(LiquidStreamSegment(false, 0.0f)))
 
@@ -75,9 +77,11 @@ object DrawShapesExample {
                 RenderingHints.KEY_RENDERING to RenderingHints.VALUE_RENDER_QUALITY))
             g2d.setRenderingHints(renderingHints)
 
-            g2d.drawImage(
-                ImageIO.read(this.javaClass.getResource("/images/heart.jpg")),
-                140, 50, 236*3, 218*3, this)
+            if (displayImage) {
+                g2d.drawImage(
+                    ImageIO.read(this.javaClass.getResource("/images/heart.jpg")),
+                    140, 50, 236*3, 218*3, this)
+            }
             g2d.render(piping, editableLiquidStream)
 
             g.drawImage(backBufferImage, 0, 0, this)
@@ -146,6 +150,10 @@ object DrawShapesExample {
                 2 -> spiral
                 else -> throw IllegalArgumentException("No piping under slot ID $slotId")
             }
+        }
+
+        fun toggleImage() {
+            displayImage = !displayImage
         }
     }
 }
