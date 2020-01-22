@@ -22,6 +22,7 @@ object DrawShapesExample {
         val frameWidth = 1024
         val frameHeight = 768
         frame.setSize(frameWidth, frameHeight)
+        frame.background = Color.WHITE
         frame.isVisible = true
         frame.addKeyListener(object : KeyListener {
             override fun keyTyped(e: KeyEvent?) {
