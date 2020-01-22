@@ -99,7 +99,7 @@ object DrawShapesExample {
             val height = image.getHeight(this)
             val bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR)
             bufferedImage.graphics.drawImage(image, 0, 0, this)
-            with (File("Image${lastSavedImageId.toString().padStart(3, '0')}.png")) {
+            with (File("Image${lastSavedImageId.toString().padStart(5, '0')}.png")) {
                 ImageIO.write(bufferedImage, "png", this)
                 println("Storing image to $this")
             }
