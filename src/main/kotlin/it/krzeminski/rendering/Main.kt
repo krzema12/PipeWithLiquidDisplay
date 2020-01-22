@@ -1,12 +1,15 @@
 package it.krzeminski.rendering
 
+import com.beust.klaxon.Klaxon
 import it.krzeminski.examples.piping.parallelLines
+import it.krzeminski.examples.piping.spiral
 import it.krzeminski.model.LiquidStream
 import it.krzeminski.model.LiquidStreamSegment
 import it.krzeminski.repeat
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
+import java.io.File
 import javax.imageio.ImageIO
 
 object DrawShapesExample {
@@ -32,6 +35,20 @@ object DrawShapesExample {
                     's' -> pipeWithLiquidDisplayComponent.changeLiquidOffset(-200.0f)
                     'e' -> pipeWithLiquidDisplayComponent.addPieceOfLiquid(200.0f)
                     'd' -> pipeWithLiquidDisplayComponent.addPieceOfAir(200.0f)
+                    'c' -> pipeWithLiquidDisplayComponent.clearLiquidStream()
+                }
+                e?.let {
+                    if (e.keyCode in 48..58) {
+                        val slotId = e.keyCode - 48
+
+                        if (e.isShiftDown) { // Store liquid stream.
+                            pipeWithLiquidDisplayComponent.storeLiquidStream(slotId)
+                        } else if (e.isControlDown) { // Load piping.
+                            pipeWithLiquidDisplayComponent.loadPiping(slotId)
+                        } else { // Load liquid stream.
+                            pipeWithLiquidDisplayComponent.loadLiquidStream(slotId)
+                        }
+                    }
                 }
                 frame.repaint()
             }
@@ -43,6 +60,7 @@ object DrawShapesExample {
 
     internal class PipeWithLiquidDisplayComponent() : Component() {
         var liquidOffset: Float = 0.0f
+        var piping = parallelLines
         var editableLiquidStream = LiquidStream(
             streamSegment = listOf(LiquidStreamSegment(false, 0.0f)))
 
@@ -57,15 +75,6 @@ object DrawShapesExample {
                 RenderingHints.KEY_RENDERING to RenderingHints.VALUE_RENDER_QUALITY))
             g2d.setRenderingHints(renderingHints)
 
-            val piping = parallelLines
-//            val liquidStream = LiquidStream(
-//                streamSegment = listOf(LiquidStreamSegment(false, liquidOffset)) + listOf(
-//                    LiquidStreamSegment(true, 12340.0f),
-//                    LiquidStreamSegment(false, 234.0f),
-//                    LiquidStreamSegment(true, 345.0f),
-//                    LiquidStreamSegment(false, 567.0f)
-//                ).repeat(30)
-//            )
             g2d.drawImage(
                 ImageIO.read(this.javaClass.getResource("/images/heart.jpg")),
                 100, 50, 236*3, 218*3, this)
@@ -109,6 +118,34 @@ object DrawShapesExample {
             editableLiquidStream = editableLiquidStream.copy(streamSegment =
                 listOf(first.copy(liquidPresent = false, volume = first.volume + airVolume))
                         + editableLiquidStream.streamSegment.drop(1))
+        }
+
+        fun storeLiquidStream(slotId: Int) {
+            with (File("LiquidStream$slotId.json")) {
+                writeText(Klaxon().toJsonString(editableLiquidStream))
+                println("Stored in ${this.absolutePath}")
+            }
+        }
+
+        fun loadLiquidStream(slotId: Int) {
+            with (File("LiquidStream$slotId.json")) {
+                println("Loading from ${this.absolutePath}")
+                editableLiquidStream = Klaxon().parse(readText())
+                    ?: throw IllegalArgumentException("Invalid JSON")
+            }
+        }
+
+        fun clearLiquidStream() {
+            editableLiquidStream = LiquidStream(
+                streamSegment = listOf(LiquidStreamSegment(false, 0.0f)))
+        }
+
+        fun loadPiping(slotId: Int) {
+            piping = when (slotId) {
+                1 -> parallelLines
+                2 -> spiral
+                else -> throw IllegalArgumentException("No piping under slot ID $slotId")
+            }
         }
     }
 }
