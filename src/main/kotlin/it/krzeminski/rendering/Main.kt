@@ -5,10 +5,10 @@ import it.krzeminski.examples.piping.parallelLines
 import it.krzeminski.examples.piping.spiral
 import it.krzeminski.model.LiquidStream
 import it.krzeminski.model.LiquidStreamSegment
-import it.krzeminski.repeat
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
+import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -38,6 +38,7 @@ object DrawShapesExample {
                     'd' -> pipeWithLiquidDisplayComponent.addPieceOfAir(200.0f)
                     'c' -> pipeWithLiquidDisplayComponent.clearLiquidStream()
                     'i' -> pipeWithLiquidDisplayComponent.toggleImage()
+                    'r' -> pipeWithLiquidDisplayComponent.toggleImageStoring()
                 }
                 e?.let {
                     if (e.keyCode in 48..58) {
@@ -64,8 +65,10 @@ object DrawShapesExample {
         var liquidOffset: Float = 0.0f
         var piping = parallelLines
         var displayImage = true
+        var shouldStoreImage = false
         var editableLiquidStream = LiquidStream(
             streamSegment = listOf(LiquidStreamSegment(false, 0.0f)))
+        var lastSavedImageId = 0
 
         override fun paint(g: Graphics) {
             // Draw to a back-buffer first.
@@ -85,8 +88,24 @@ object DrawShapesExample {
             }
             g2d.render(piping, editableLiquidStream)
 
+            if (shouldStoreImage) {
+                storeImage(backBufferImage)
+            }
             g.drawImage(backBufferImage, 0, 0, this)
         }
+
+        private fun storeImage(image: Image) {
+            val width = image.getWidth(this)
+            val height = image.getHeight(this)
+            val bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR)
+            bufferedImage.graphics.drawImage(image, 0, 0, this)
+            with (File("Image${lastSavedImageId.toString().padStart(3, '0')}.png")) {
+                ImageIO.write(bufferedImage, "png", this)
+                println("Storing image to $this")
+            }
+            lastSavedImageId++
+        }
+
 
         fun addPieceOfLiquid(volume: Float) {
             with (editableLiquidStream) {
@@ -155,6 +174,10 @@ object DrawShapesExample {
 
         fun toggleImage() {
             displayImage = !displayImage
+        }
+
+        fun toggleImageStoring() {
+            shouldStoreImage = !shouldStoreImage
         }
     }
 }
