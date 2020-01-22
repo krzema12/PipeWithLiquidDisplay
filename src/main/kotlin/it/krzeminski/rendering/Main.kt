@@ -77,7 +77,7 @@ object DrawShapesExample {
 
             g2d.drawImage(
                 ImageIO.read(this.javaClass.getResource("/images/heart.jpg")),
-                100, 50, 236*3, 218*3, this)
+                140, 50, 236*3, 218*3, this)
             g2d.render(piping, editableLiquidStream)
 
             g.drawImage(backBufferImage, 0, 0, this)
