@@ -106,8 +106,8 @@ object DrawShapesExample {
 
             if (displayImage) {
                 g2d.drawImage(
-                    ImageIO.read(this.javaClass.getResource("/images/heart.jpg")),
-                    140, 50, 236*3, 218*3, this)
+                    ImageIO.read(this.javaClass.getResource("/images/SpaceInvaders.jpg")),
+                    450, 80, 236*4, 218*4, this)
             }
             g2d.render(piping, editableLiquidStream)
 
