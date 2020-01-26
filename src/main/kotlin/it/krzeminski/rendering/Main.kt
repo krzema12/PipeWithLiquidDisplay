@@ -2,6 +2,7 @@ package it.krzeminski.rendering
 
 import com.beust.klaxon.Klaxon
 import it.krzeminski.examples.piping.parallelLines
+import it.krzeminski.examples.piping.parallelLinesEyeShaped
 import it.krzeminski.examples.piping.spiral
 import it.krzeminski.model.LiquidStream
 import it.krzeminski.model.LiquidStreamSegment
@@ -190,6 +191,7 @@ object DrawShapesExample {
             piping = when (slotId) {
                 1 -> parallelLines
                 2 -> spiral
+                3 -> parallelLinesEyeShaped
                 else -> throw IllegalArgumentException("No piping under slot ID $slotId")
             }
         }
