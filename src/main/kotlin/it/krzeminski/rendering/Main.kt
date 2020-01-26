@@ -39,6 +39,23 @@ object DrawShapesExample {
                     'c' -> pipeWithLiquidDisplayComponent.clearLiquidStream()
                     'i' -> pipeWithLiquidDisplayComponent.toggleImage()
                     'r' -> pipeWithLiquidDisplayComponent.toggleImageStoring()
+                    'p' -> {
+                        val numberOfSteps = 1800
+                        val stepSizeAsVolume = 200.0f
+                        repeat(numberOfSteps) {
+                            pipeWithLiquidDisplayComponent.changeLiquidOffset(-stepSizeAsVolume)
+                        }
+                        println("1")
+                        pipeWithLiquidDisplayComponent.toggleImageStoring()
+                        println("2")
+                        repeat(numberOfSteps) {
+                            pipeWithLiquidDisplayComponent.changeLiquidOffset(stepSizeAsVolume)
+                            pipeWithLiquidDisplayComponent.renderOffline()
+                        }
+                        println("3")
+                        pipeWithLiquidDisplayComponent.toggleImageStoring()
+                        println("4")
+                    }
                 }
                 e?.let {
                     if (e.keyCode in 48..58) {
@@ -71,6 +88,11 @@ object DrawShapesExample {
         var lastSavedImageId = 0
 
         override fun paint(g: Graphics) {
+            val backBufferImage = renderOffline()
+            g.drawImage(backBufferImage, 0, 0, this)
+        }
+
+        fun renderOffline(): Image {
             // Draw to a back-buffer first.
             val backBufferImage = createImage(width, height)
             val backBufferImageGraphics = backBufferImage.graphics
@@ -91,7 +113,7 @@ object DrawShapesExample {
             if (shouldStoreImage) {
                 storeImage(backBufferImage)
             }
-            g.drawImage(backBufferImage, 0, 0, this)
+            return backBufferImage
         }
 
         private fun storeImage(image: Image) {
