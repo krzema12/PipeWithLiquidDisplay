@@ -20,8 +20,8 @@ object DrawShapesExample {
         val pipeWithLiquidDisplayComponent = PipeWithLiquidDisplayComponent()
         frame.add(pipeWithLiquidDisplayComponent)
 
-        val frameWidth = 1024
-        val frameHeight = 768
+        val frameWidth = 1920
+        val frameHeight = 1080
         frame.setSize(frameWidth, frameHeight)
         frame.background = Color.WHITE
         frame.isVisible = true
